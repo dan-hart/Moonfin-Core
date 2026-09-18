@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:server_core/server_core.dart';
 
+import '../../preference/user_preferences.dart';
 import '../../util/platform_detection.dart';
 import '../models/aggregated_item.dart';
 import '../models/home_row.dart';
@@ -13,7 +14,19 @@ import 'deep_link_service.dart';
 /// "Latest" home content into the shared App Group container (consumed by the
 /// MoonfinTopShelf extension) and routes the `moonfin://` deep links the shelf
 /// emits back into the app.
+///
+/// [UserPreferences.appleTvTopShelfEnabled] turns the snapshot off. With no
+/// cache to read the extension returns nothing and tvOS shows the app's static
+/// Top Shelf artwork instead, so switching it off clears the cache at once and
+/// switching it back on republishes the last rows seen.
 class TopShelfService {
+  TopShelfService() {
+    if (PlatformDetection.isAppleTV) {
+      _prefs.addListener(_onPreferencesChanged);
+    }
+  }
+
+  UserPreferences get _prefs => GetIt.instance<UserPreferences>();
   static const _channel = MethodChannel('moonfin/appletv_topshelf');
   static const _maxItems = 15;
   static const _debounceDelay = Duration(seconds: 2);
@@ -24,11 +37,14 @@ class TopShelfService {
   static const _image2xMaxHeight = 2160;
 
   Timer? _debounce;
+  List<HomeRow>? _lastRows;
+  bool _enabled = true;
 
   /// Schedules a Top Shelf cache refresh, coalescing the rapid successive
   /// calls a single home load produces into one write.
   void update(List<HomeRow> rows) {
     if (!PlatformDetection.isAppleTV) return;
+    _lastRows = rows;
     _debounce?.cancel();
     _debounce = Timer(_debounceDelay, () => unawaited(_writeCache(rows)));
   }
@@ -36,13 +52,41 @@ class TopShelfService {
   void dispose() {
     _debounce?.cancel();
     _debounce = null;
+    if (PlatformDetection.isAppleTV) {
+      _prefs.removeListener(_onPreferencesChanged);
+    }
+  }
+
+  void _onPreferencesChanged() {
+    final enabled = _prefs.get(UserPreferences.appleTvTopShelfEnabled);
+    if (enabled == _enabled) return;
+    _enabled = enabled;
+    _debounce?.cancel();
+    if (!enabled) {
+      unawaited(_clearCache());
+    } else if (_lastRows case final rows?) {
+      unawaited(_writeCache(rows));
+    }
+  }
+
+  Future<void> _clearCache() async {
+    try {
+      await _channel.invokeMethod('clearCache');
+    } catch (_) {}
   }
 
   Future<void> _writeCache(List<HomeRow> rows) async {
+    _enabled = _prefs.get(UserPreferences.appleTvTopShelfEnabled);
+    if (!_enabled) {
+      await _clearCache();
+      return;
+    }
     try {
       final imageApi = GetIt.instance<MediaServerClient>().imageApi;
       final items = <Map<String, dynamic>>[];
-      for (final row in rows.where((r) => r.rowType == HomeRowType.latestMedia)) {
+      for (final row in rows.where(
+        (r) => r.rowType == HomeRowType.latestMedia,
+      )) {
         for (final item in row.items) {
           final payload = _itemPayload(item, imageApi);
           if (payload != null) items.add(payload);

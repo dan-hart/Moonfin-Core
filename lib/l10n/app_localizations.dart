@@ -22726,6 +22726,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How far focus moves for each swipe on the Siri Remote touchpad'**
   String get siriRemoteSwipeSensitivityDescription;
+
+  /// Settings section header for options that affect the tvOS home screen outside the app
+  ///
+  /// In en, this message translates to:
+  /// **'Apple TV home screen'**
+  String get appleTvHomeScreen;
+
+  /// Apple TV settings switch label for publishing recently added items to the tvOS home screen Top Shelf
+  ///
+  /// In en, this message translates to:
+  /// **'Show latest media in Top Shelf'**
+  String get appleTvTopShelf;
+
+  /// Apple TV settings subtitle explaining what the Top Shelf shows when the switch is off
+  ///
+  /// In en, this message translates to:
+  /// **'Off, the Top Shelf shows the Moonfin artwork instead of recently added items'**
+  String get appleTvTopShelfDescription;
 }
 
 class _AppLocalizationsDelegate

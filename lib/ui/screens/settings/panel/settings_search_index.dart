@@ -835,6 +835,13 @@ List<_SettingsSearchEntry> _buildSettingsSearchIndex({
     ],
 
     home.screen(keywords: ['home page', 'rows']),
+    if (PlatformDetection.isAppleTV)
+      home.leaf(
+        'pref_appletv_top_shelf_enabled',
+        l10n.appleTvTopShelf,
+        subtitle: l10n.appleTvTopShelfDescription,
+        keywords: ['top shelf', 'home screen', 'apple tv', 'logo'],
+      ),
     home.leaf('pref_home_rows_style', l10n.rowsType, keywords: [
       'classic',
       'modern rows',

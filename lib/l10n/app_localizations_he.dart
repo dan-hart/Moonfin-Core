@@ -12830,4 +12830,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get siriRemoteSwipeSensitivityDescription =>
       'How far focus moves for each swipe on the Siri Remote touchpad';
+
+  @override
+  String get appleTvHomeScreen => 'Apple TV home screen';
+
+  @override
+  String get appleTvTopShelf => 'Show latest media in Top Shelf';
+
+  @override
+  String get appleTvTopShelfDescription =>
+      'Off, the Top Shelf shows the Moonfin artwork instead of recently added items';
 }

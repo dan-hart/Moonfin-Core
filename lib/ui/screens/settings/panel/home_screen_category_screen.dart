@@ -28,8 +28,7 @@ class _HomeScreenCategoryScreenState extends State<_HomeScreenCategoryScreen> {
     final rowsStyle = _prefs.get(UserPreferences.homeRowsStyle);
     final isMobileUi = PlatformDetection.useMobileUi;
     final isFullScreenRows =
-        !isMobileUi &&
-        _prefs.get(UserPreferences.fullScreenRows);
+        !isMobileUi && _prefs.get(UserPreferences.fullScreenRows);
     final isInfoOverlayOn =
         !isMobileUi &&
         rowsStyle == HomeRowsStyle.v1 &&
@@ -39,6 +38,19 @@ class _HomeScreenCategoryScreenState extends State<_HomeScreenCategoryScreen> {
       appBar: buildSettingsAppBar(context, Text(l10n.homeScreen)),
       body: ListView(
         children: [
+          if (PlatformDetection.isAppleTV) ...[
+            _SectionHeader(l10n.appleTvHomeScreen),
+            adaptiveListSection(
+              children: [
+                SwitchPreferenceTile(
+                  preference: UserPreferences.appleTvTopShelfEnabled,
+                  title: l10n.appleTvTopShelf,
+                  subtitle: l10n.appleTvTopShelfDescription,
+                  icon: Icons.branding_watermark_outlined,
+                ),
+              ],
+            ),
+          ],
           _SectionHeader(l10n.homeRowDisplay),
           adaptiveListSection(
             children: [
@@ -203,7 +215,9 @@ class _HomeScreenCategoryScreenState extends State<_HomeScreenCategoryScreen> {
                 _TvSettingsListTile(
                   leading: const Icon(Icons.link),
                   title: const Text('External Home Rows'),
-                  subtitle: const Text('Set-up external sources for Home Rows (e.g., Seerr, IMDb, Letterboxd, and more!)'),
+                  subtitle: const Text(
+                    'Set-up external sources for Home Rows (e.g., Seerr, IMDb, Letterboxd, and more!)',
+                  ),
                   onTap: () =>
                       context.pushSettingsScreen(const _ExternalListsScreen()),
                 ),

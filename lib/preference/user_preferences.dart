@@ -1332,6 +1332,14 @@ class UserPreferences extends ChangeNotifier {
     values: SiriRemoteSwipeSensitivity.values,
   );
 
+  /// Whether the Apple TV home screen Top Shelf shows the latest media above
+  /// the app icon. Off, the shelf falls back to the static Moonfin artwork.
+  /// Belongs to the device, so it isn't synced.
+  static final appleTvTopShelfEnabled = Preference(
+    key: 'pref_appletv_top_shelf_enabled',
+    defaultValue: true,
+  );
+
   static final visualTheme = EnumPreference(
     key: 'app_theme_id',
     defaultValue: PlatformDetection.isApple || PlatformDetection.isAppleTV

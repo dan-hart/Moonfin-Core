@@ -12059,5 +12059,17 @@
   "siriRemoteSwipeSensitivityDescription": "How far focus moves for each swipe on the Siri Remote touchpad",
   "@siriRemoteSwipeSensitivityDescription": {
     "description": "Apple TV settings subtitle for the Siri Remote touchpad swipe sensitivity option"
+  },
+  "appleTvHomeScreen": "Apple TV home screen",
+  "@appleTvHomeScreen": {
+    "description": "Settings section header for options that affect the tvOS home screen outside the app"
+  },
+  "appleTvTopShelf": "Show latest media in Top Shelf",
+  "@appleTvTopShelf": {
+    "description": "Apple TV settings switch label for publishing recently added items to the tvOS home screen Top Shelf"
+  },
+  "appleTvTopShelfDescription": "Off, the Top Shelf shows the Moonfin artwork instead of recently added items",
+  "@appleTvTopShelfDescription": {
+    "description": "Apple TV settings subtitle explaining what the Top Shelf shows when the switch is off"
   }
 }
