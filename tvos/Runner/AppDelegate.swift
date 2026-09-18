@@ -46,6 +46,11 @@ class AppDelegate: FlutterAppDelegate {
     private var sfSymbolChannel: AppleTvSfSymbolChannel?
     private var gameChannel: AppleTvGameChannel?
 
+    /// Root of the one window, which SceneDelegate puts up once the scene
+    /// connects. Built here because the channels need the Flutter view
+    /// controller inside it before that happens.
+    private(set) var gamepadHost: GamepadNavigationHostViewController?
+
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -53,14 +58,11 @@ class AppDelegate: FlutterAppDelegate {
         let flutterViewController = FlutterViewController(project: nil, nibName: nil, bundle: nil)
         let gamepadHost = GamepadNavigationHostViewController(
             flutterViewController: flutterViewController)
-        let window = UIWindow(frame: UIScreen.main.bounds)
-        window.rootViewController = gamepadHost
-        window.makeKeyAndVisible()
-        self.window = window
+        self.gamepadHost = gamepadHost
 
         // FlutterAppDelegate only hands out registrars when the window's root
-        // is a FlutterViewController, and the host sits there now, so plugins
-        // register against the controller directly.
+        // is a FlutterViewController, and the host will sit there instead, so
+        // plugins register against the controller directly.
         GeneratedPluginRegistrant.register(with: flutterViewController)
 
         appleTvVideoChannel = AppleTvVideoChannel(
@@ -85,20 +87,13 @@ class AppDelegate: FlutterAppDelegate {
             textures: flutterViewController,
             rootViewController: flutterViewController)
 
-        if let launchUrl = launchOptions?[.url] as? URL {
-            topShelfChannel?.deliverDeepLink(launchUrl, isLaunch: true)
-        }
-
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    override func application(
-        _ app: UIApplication,
-        open url: URL,
-        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
-    ) -> Bool {
-        topShelfChannel?.deliverDeepLink(url, isLaunch: false)
-        return true
+    /// Under the scene life cycle URLs reach SceneDelegate, which hands them
+    /// here so the Top Shelf channel stays the one place that routes them.
+    func deliverDeepLink(_ url: URL, isLaunch: Bool) {
+        topShelfChannel?.deliverDeepLink(url, isLaunch: isLaunch)
     }
 }
 
